@@ -1,4 +1,4 @@
-# web-audio-write [![Build Status](https://travis-ci.org/audiojs/web-audio-write.svg?branch=master)](https://travis-ci.org/audiojs/web-audio-write) [![Greenkeeper badge](https://badges.greenkeeper.io/audiojs/web-audio-write.svg)](https://greenkeeper.io/) [![stable](https://img.shields.io/badge/stability-unstable-green.svg)](http://github.com/badges/stability-badges)
+# web-audio-write [![Greenkeeper badge](https://badges.greenkeeper.io/audiojs/web-audio-write.svg)](https://greenkeeper.io/) [![stable](https://img.shields.io/badge/stability-unstable-green.svg)](http://github.com/badges/stability-badges)
 
 Send AudioBuffer/Buffer/ArrayBuffer/FloatArray data to web audio.
 
@@ -7,28 +7,24 @@ Send AudioBuffer/Buffer/ArrayBuffer/FloatArray data to web audio.
 [![npm install web-audio-write](https://nodei.co/npm/web-audio-write.png?mini=true)](https://npmjs.org/package/web-audio-write/)
 
 ```js
-const Writer = require('web-audio-write')
-const Generate = require('audio-generator')
-const util = require('audio-buffer-utils')
+const createWriter = require('web-audio-write')
+const createGenerator = require('audio-generator')
 
-let write = Writer(context.destination)
-let generate = Generate(t => Math.sin(440 * t * Math.PI * 2))
+let write = createWriter(context.destination)
+let generate = createGenerator(t => Math.sin(440 * t * Math.PI * 2))
 let stop = false
 
-function gen (err) {
+function tick (err) {
 	if (err) throw err
 	if (stop) {
 		write(null)
 		return
 	}
 
-	//generate new audio buffer
-	let aBuf = generate(util.create(frame))
-
 	//send audio buffer to audio node
-	write(aBuf, gen)
+	write(generate(), tick)
 }
-gen()
+tick()
 
 setTimeout(() => {
 	stop = true
