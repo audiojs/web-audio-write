@@ -1,0 +1,39 @@
+{
+  "name": "web-audio-write",
+  "version": "1.0.0",
+  "description": "Send data to web-audio node",
+  "main": "./index.js",
+  "scripts": {
+    "lint": "eslint *.js --ignore-pattern test*",
+    "test": "echo No tests for node available",
+    "test:browser": "budo test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/audiojs/web-audio-write.git"
+  },
+  "keywords": [
+    "waa",
+    "audiojs",
+    "web-audio",
+    "audio"
+  ],
+  "author": "Dima Yv <dfcreative@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/audiojs/web-audio-write/issues"
+  },
+  "homepage": "https://github.com/audiojs/web-audio-write#readme",
+  "devDependencies": {
+    "audio-context": "^1.0.1",
+    "audio-generator": "^2.1.2",
+    "tape": "^4.6.3"
+  },
+  "dependencies": {
+    "audio-buffer": "^4.0.1",
+    "audio-buffer-list": "^3.1.0",
+    "audio-buffer-utils": "^5.0.1",
+    "is-audio-buffer": "^1.0.11",
+    "object-assign": "^4.1.1"
+  }
+}
