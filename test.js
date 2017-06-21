@@ -122,3 +122,19 @@ test('Chain of sound processing', function (t) {
 });
 
 test('Delayed connection/start');
+
+
+test('Bad argument', t => {
+	try {
+		Writer()
+	} catch (e) {
+		t.ok(e)
+	}
+
+	try {
+		Writer([])
+	} catch (e) {
+		t.ok(e)
+		t.end()
+	}
+})
