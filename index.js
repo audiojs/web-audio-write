@@ -96,6 +96,8 @@ function WAAWriter (target, options) {
 			push(buffer)
 		}
 		release = cb;
+
+		return buffer
 	}
 
 
