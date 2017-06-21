@@ -11,6 +11,7 @@ const util = require('audio-buffer-utils')
 const isAudioBuffer = require('is-audio-buffer')
 const AudioBufferList = require('audio-buffer-list')
 const AudioBuffer = require('audio-buffer')
+const assert = require('assert')
 
 module.exports = WAAWriter;
 
@@ -20,7 +21,8 @@ module.exports = WAAWriter;
  * @constructor
  */
 function WAAWriter (target, options) {
-	if (!target || !target.context) throw Error('Pass AudioNode instance first argument')
+	assert(target, 'Pass AudioNode instance first argument')
+	assert(target.context, 'Pass AudioNode instance first')
 
 	if (!options) {
 		options = {};
