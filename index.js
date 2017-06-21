@@ -14,16 +14,7 @@ const AudioBuffer = require('audio-buffer')
 
 module.exports = WAAWriter;
 
-function draw(arr) {
-	let canvas = document.body.appendChild(document.createElement('canvas'))
-	let ctx = canvas.getContext('2d')
-	let w = canvas.width, h = canvas.height
 
-	ctx.fillStyle = 'black'
-	for (let i = 0, l = arr.length; i < l; i++) {
-		ctx.fillRect(w* i/l, h*.5, 1, (arr[i]*.5)*h )
-	}
-}
 
 /**
  * @constructor
