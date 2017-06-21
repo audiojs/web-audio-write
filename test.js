@@ -109,11 +109,11 @@ test('Chain of sound processing', function (t) {
 	var write = Writer(panner);
 
 	var generate = Generate(function (time) {
-		return Math.sin(Math.PI * 2 * 220 * time);
+		return Math.sin(Math.PI * 2 * 440 * time);
 	})
 
 
-	write(generate(util.create(1024*3, 2)))
+	write(generate(util.create(1024*4, 2)))
 
 	setTimeout(function () {
 		write(null);
