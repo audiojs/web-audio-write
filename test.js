@@ -17,7 +17,7 @@ test('Writer', function (t) {
 	let isStopped = 0;
 	setTimeout(() => {
 		isStopped = 1;
-	}, 500);
+	}, 1000);
 	function gen (err) {
 		if (err) throw err;
 		if (isStopped) {
@@ -140,8 +140,10 @@ test('Bad argument', t => {
 })
 
 
-test.only('Should not finish before limit', t => {
-	let write = Writer(context.destination)
+test('Should not finish before limit', t => {
+	let write = Writer(context.destination, {
+		mode: 'buffer'
+	})
 
 	let buf = util.create(22050)
 	util.noise(buf)

@@ -144,12 +144,11 @@ function WAAWriter (target, options) {
 			if (isStopped) return
 
 			let buf = fetch(e.inputBuffer.length)
+			util.copy(buf, e.outputBuffer)
 
 			//measure the moment when we have fed all the data for the last cb
 			//and trigger according callbacks
 			consume(buf.length)
-
-			util.copy(buf, e.outputBuffer)
 		})
 
 		//start should be done after the connection, or there is a chance it won’t
@@ -157,22 +156,6 @@ function WAAWriter (target, options) {
 		bufferNode.start()
 
 		return node;
-	}
-
-	//walk over callback stack, invoke according callbacks
-	function consume (len) {
-		if (!callbackMarks.length) return
-
-		if (callbackMarks[0]) callbackMarks[0] -= len
-
-		if (callbackMarks[0] <= 0) {
-			let offset = callbackMarks.shift()
-			let cb = callbackQueue.shift()
-			cb()
-
-			//if we overconsumed the last count - consume next callback
-			if (offset < 0) consume(-offset)
-		}
 	}
 
 
@@ -216,18 +199,16 @@ function WAAWriter (target, options) {
 
 			//if offset has changed - notify processor to provide a new piece of data
 			if (lastCount - playedCount < samplesPerFrame) {
+				let buf = fetch(samplesPerFrame)
+
 				//send queued data chunk to buffer
-				util.copy(fetch(samplesPerFrame), buffer, lastCount % buffer.length)
+				util.copy(buf, buffer, lastCount % buffer.length)
 
 				//increase rendered count
 				lastCount += samplesPerFrame;
 
 				//if there is a holding pressure control - release it
-				if (release) {
-					let cb = release;
-					release = null;
-					cb()
-				}
+				consume(samplesPerFrame)
 
 				//call tick extra-time in case if there is a room for buffer
 				//it will plan timeout, if none
@@ -242,4 +223,23 @@ function WAAWriter (target, options) {
 			}
 		}
 	}
+
+
+	//walk over callback stack, invoke according callbacks
+	function consume (len) {
+		count -= len
+
+		if (!callbackMarks.length) return
+
+		for (let i = 0, l = callbackMarks.length; i < l; i++) {
+			callbackMarks[i] -= len
+		}
+
+		while (callbackMarks[0] <= 0) {
+			callbackMarks.shift()
+			let cb = callbackQueue.shift()
+			cb()
+		}
+	}
+
 }
