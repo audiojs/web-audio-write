@@ -35,16 +35,16 @@ setTimeout(() => {
 
 ### `let write = createWriter(destNode, options?)`
 
-Create function writing to web audio AudioNode. The created writer has following signature: `audioBuffer = write(audioBuffer, (err, data)=>{}?)`. To schedule ending, call `write(null)`. To halt, skipping the accumulated data, call `write.end()`.
+Create function writing to web-audio _AudioNode_. The created writer has the following signature: `buf = write(buf, (err, buf)=>{}?)`. To schedule ending, call `write(null)`. To halt instantly, call `write.end()`.
 
-`options` parameter may provide:
+`options` may provide:
 
-* `mode` − `'script'` or `'buffer'`, defines buffer or script mode of feeding data, may affect performance insignificantly.
-* `context` − audio context, by default `destNode` context is used.
-* `samplesPerFrame` defines processing block size.
-* `channels` defines expected buffer number of channels.
+* `mode` − `'script'` or `'buffer'`, defines mode of feeding data, may affect performance insignificantly.
+* `context` − audio context, by default `destNode.context` is used.
+* `samplesPerFrame` defines processing block size, defaults to 1024
+* `channels` defines expected buffer number of channels, defaults to `destNode.channelCount`.
 
-Writer recognizes any type of data sent into it: [AudioBuffer](https://github.com/audiojs/audio-buffer), [AudioBufferList](https://github.com/audiojs/audio-buffer-list), ArrayBuffer, FloatArray, Buffer, Array. `samplerPerFrame` and `channels` are used to convert raw data into audioBuffer.
+Writer recognizes any type of data sent into it: [AudioBuffer](https://github.com/audiojs/audio-buffer), [AudioBufferList](https://github.com/audiojs/audio-buffer-list), ArrayBuffer, FloatArray, Buffer, Array. `samplerPerFrame` and `channels` are used to convert raw data to AudioBuffer.
 
 Internally writer uses [audio-buffer-list](https://github.com/audiojs/audio-buffer-list) to manage memory efficiently, providing lowest possible latency.
 

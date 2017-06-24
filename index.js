@@ -43,7 +43,7 @@ function WAAWriter (target, options) {
 		mode: 'script',
 		samplesPerFrame: 1024,
 
-		channels: target.numberOfChannels || 2
+		channels: target.channelCount || 2
 	}, options)
 
 	let context = options.context;
@@ -86,7 +86,7 @@ function WAAWriter (target, options) {
 
 	//return writer function
 	function write (buffer, cb) {
-		if (isStopped) return
+		if (isStopped) return false
 
 		//test if we have to end
 		//FIXME it should wait till all the data fed
@@ -96,7 +96,7 @@ function WAAWriter (target, options) {
 				cb && cb()
 			})
 			callbackMarks.push(count)
-			return
+			return null
 		}
 
 		//push buffer
