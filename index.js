@@ -78,6 +78,8 @@ function WAAWriter (target, options) {
 	//data count
 	let count = 0
 
+	//save urgent end function
+	write.end = end
 
 	return write;
 
@@ -89,8 +91,11 @@ function WAAWriter (target, options) {
 		//test if we have to end
 		//FIXME it should wait till all the data fed
 		if (buffer == null) {
-			node.disconnect()
-			isStopped = true
+			callbackQueue.push(function () {
+				end()
+				cb && cb()
+			})
+			callbackMarks.push(count)
 			return
 		}
 
@@ -109,6 +114,12 @@ function WAAWriter (target, options) {
 		}
 
 		return buffer
+	}
+
+	function end () {
+		consume(count)
+		isStopped = true
+		node.disconnect()
 	}
 
 	//get last ready data

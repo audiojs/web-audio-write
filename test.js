@@ -17,7 +17,7 @@ test('Writer', function (t) {
 	let isStopped = 0;
 	setTimeout(() => {
 		isStopped = 1;
-	}, 1000);
+	}, 500);
 	function gen (err) {
 		if (err) throw err;
 		if (isStopped) {
@@ -159,4 +159,31 @@ test('Should not finish before limit', t => {
 	setTimeout(() => {
 		trigger = true
 	}, 250)
+})
+
+
+test('End should be called after all data is fed', t => {
+	t.plan(3)
+
+	let write = Writer(context.destination)
+
+	let buf = util.create(4410)
+	util.noise(buf)
+
+	let trigger = false
+
+	write(buf, (err, data) => {
+		if (err) t.fail(err)
+		t.equal(trigger, true)
+	})
+	write(null, (err) => {
+		if (err) t.fail(err)
+		t.equal(trigger, true)
+	})
+
+	t.equal(trigger, false)
+
+	setTimeout(() => {
+		trigger = true
+	}, 50)
 })
