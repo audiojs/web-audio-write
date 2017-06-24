@@ -40,7 +40,7 @@ test('Write AudioBuffer', function (t) {
 	write(buf);
 
 	setTimeout(function () {
-		write.end();
+		write(null);
 		t.end();
 	}, 300);
 });
@@ -54,7 +54,7 @@ test('Write Float32Array', function (t) {
 	write(buf.getChannelData(0));
 
 	setTimeout(function () {
-		write.end();
+		write(null);
 		t.end();
 	}, 300);
 });
@@ -137,4 +137,24 @@ test('Bad argument', t => {
 		t.ok(e)
 		t.end()
 	}
+})
+
+
+test.only('Should not finish before limit', t => {
+	let write = Writer(context.destination)
+
+	let buf = util.create(22050)
+	util.noise(buf)
+
+	let trigger = false
+
+	write(buf, (err, data) => {
+		if (err) t.fail(err)
+		t.equal(trigger, true)
+		t.end()
+	})
+
+	setTimeout(() => {
+		trigger = true
+	}, 250)
 })

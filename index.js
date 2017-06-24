@@ -50,8 +50,9 @@ function WAAWriter (target, options) {
 	let channels = options.channels;
 	let samplesPerFrame = options.samplesPerFrame;
 	let sampleRate = context.sampleRate;
-	let node, release, isStopped, isEmpty = false;
+	let node, release, isStopped;
 	let silence = new AudioBuffer(context, {length: samplesPerFrame, numberOfChannels: channels})
+
 
 	//queued data to send to output
 	let data = new AudioBufferList(0, channels)
@@ -70,47 +71,49 @@ function WAAWriter (target, options) {
 	//connect node
 	node.connect(target)
 
-	write.end = () => {
-		if (isStopped) return;
-		node.disconnect()
-		isStopped = true;
-	}
+	//callbacks queue & sample indexes to trigger them
+	let callbackQueue = []
+	let callbackMarks = []
+
+	//data count
+	let count = 0
+
 
 	return write;
 
+
 	//return writer function
 	function write (buffer, cb) {
-		if (isStopped) return;
+		if (isStopped) return
 
+		//test if we have to end
+		//FIXME it should wait till all the data fed
 		if (buffer == null) {
-			return write.end()
+			node.disconnect()
+			isStopped = true
+			return
 		}
-		else {
-			push(buffer)
+
+		//push buffer
+		if (!isAudioBuffer(buffer)) {
+			buffer = util.create(buffer, channels)
 		}
-		release = cb;
+
+		count += buffer.length
+		data.append(buffer)
+
+		//save callback
+		if (cb) {
+			callbackQueue.push(cb)
+			callbackMarks.push(count)
+		}
 
 		return buffer
-	}
-
-
-	//push new data for the next WAA dinner
-	function push (chunk) {
-		if (!isAudioBuffer(chunk)) {
-			chunk = util.create(chunk, channels)
-		}
-
-		data.append(chunk)
-
-		isEmpty = false;
 	}
 
 	//get last ready data
 	function fetch (size) {
 		size = size || samplesPerFrame;
-
-		//if still empty - return existing buffer
-		if (isEmpty) return data;
 
 		let output = data.copy(0, size)
 		data.consume(size)
@@ -137,18 +140,16 @@ function WAAWriter (target, options) {
 		bufferNode.buffer = new AudioBuffer(context, {length: samplesPerFrame, numberOfChannels: channels})
 
 		node = context.createScriptProcessor(samplesPerFrame)
-		node.addEventListener('audioprocess', function (e) {
-			//release causes synchronous pulling the pipeline
-			//so that we get a new data chunk
-			let cb = release;
-			release = null;
-			cb && cb()
+		node.addEventListener('audioprocess', function tick (e) {
+			if (isStopped) return
 
-			if (isStopped) return;
+			let buf = fetch(e.inputBuffer.length)
 
-			let f = fetch(e.inputBuffer.length)
-			util.copy(f, e.outputBuffer)
-			// util.copy(fetch(e.inputBuffer.length), e.outputBuffer)
+			//measure the moment when we have fed all the data for the last cb
+			//and trigger according callbacks
+			consume(buf.length)
+
+			util.copy(buf, e.outputBuffer)
 		})
 
 		//start should be done after the connection, or there is a chance it won’t
@@ -156,6 +157,22 @@ function WAAWriter (target, options) {
 		bufferNode.start()
 
 		return node;
+	}
+
+	//walk over callback stack, invoke according callbacks
+	function consume (len) {
+		if (!callbackMarks.length) return
+
+		if (callbackMarks[0]) callbackMarks[0] -= len
+
+		if (callbackMarks[0] <= 0) {
+			let offset = callbackMarks.shift()
+			let cb = callbackQueue.shift()
+			cb()
+
+			//if we overconsumed the last count - consume next callback
+			if (offset < 0) consume(-offset)
+		}
 	}
 
 
@@ -192,7 +209,7 @@ function WAAWriter (target, options) {
 
 		//tick function - if the half-buffer is passed - emit the tick event, which will fill the buffer
 		function tick (a) {
-			if (isStopped) return;
+			if (isStopped) return
 
 			let playedTime = context.currentTime - initTime;
 			let playedCount = playedTime * sampleRate;
