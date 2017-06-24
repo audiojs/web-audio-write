@@ -35,7 +35,7 @@ setTimeout(() => {
 
 ### `let write = createWriter(destNode, options?)`
 
-Create function writing to web audio AudioNode. The created writer has following signature: `audioBuffer = write(audioBuffer, (err, data)=>{}?)`. To indicate the end, call `write(null)`.
+Create function writing to web audio AudioNode. The created writer has following signature: `audioBuffer = write(audioBuffer, (err, data)=>{}?)`. To schedule ending, call `write(null)`. To halt, skipping the accumulated data, call `write.end()`.
 
 `options` parameter may provide:
 
@@ -48,9 +48,6 @@ Writer recognizes any type of data sent into it: [AudioBuffer](https://github.co
 
 Internally writer uses [audio-buffer-list](https://github.com/audiojs/audio-buffer-list) to manage memory efficiently, providing lowest possible latency.
 
-### `write.end()`
-
-Halt writing, skip all the collected data, disconnect node. To schedule ending use `write(null)`.
 
 ## Related
 
