@@ -50,7 +50,7 @@ function WAAWriter (target, options) {
 	let channels = options.channels;
 	let samplesPerFrame = options.samplesPerFrame;
 	let sampleRate = context.sampleRate;
-	let node, release, isStopped;
+	let node, isStopped;
 	let silence = new AudioBuffer(context, {length: samplesPerFrame, numberOfChannels: channels})
 
 
