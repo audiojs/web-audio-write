@@ -119,6 +119,8 @@ function WAAWriter (target, options) {
 	function end () {
 		consume(count)
 		isStopped = true
+		callbackMarks = null
+		callbackQueue = null
 		node.disconnect()
 	}
 
