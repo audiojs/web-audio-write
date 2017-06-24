@@ -35,7 +35,7 @@ setTimeout(() => {
 
 ### `let write = createWriter(destNode, options?)`
 
-Create function writing to web-audio _AudioNode_. The created writer has the following signature: `buf = write(buf, (err, buf)=>{}?)`. To schedule ending, call `write(null)`. To halt instantly, call `write.end()`.
+Create function writing to web-audio _AudioNode_. The created writer has the following signature: `buf = write(buf, onconsumed?)`. To schedule ending, call `write(null)`. To halt instantly, call `write.end()`.
 
 `options` may provide:
 
