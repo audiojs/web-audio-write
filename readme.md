@@ -44,7 +44,7 @@ Create function writing to web-audio _AudioNode_. The created writer has the fol
 * `samplesPerFrame` defines processing block size, defaults to 1024
 * `channels` defines expected buffer number of channels, defaults to `destNode.channelCount`.
 
-Writer recognizes any type of data sent into it: [AudioBuffer](https://github.com/audiojs/audio-buffer), [AudioBufferList](https://github.com/audiojs/audio-buffer-list), ArrayBuffer, FloatArray, Buffer, Array. `samplerPerFrame` and `channels` are used to convert raw data to AudioBuffer.
+Writer recognizes any type of data sent into it: [AudioBuffer](https://github.com/audiojs/audio-buffer), [AudioBufferList](https://github.com/audiojs/audio-buffer-list), ArrayBuffer, FloatArray, Buffer, Array. `samplesPerFrame` and `channels` are used to convert raw data to AudioBuffer.
 
 Internally writer uses [audio-buffer-list](https://github.com/audiojs/audio-buffer-list) to manage memory efficiently, providing lowest possible latency.
 
