@@ -1,6 +1,6 @@
 'use strict'
 
-var test = require('tape');
+var t = require('tape');
 var context = require('audio-context')();
 var Writer = require('./');
 var AudioBuffer = require('audio-buffer');
@@ -9,7 +9,7 @@ var Generate = require('audio-generator/direct.js')
 
 
 
-test('Writer', function (t) {
+t('Writer', function (t) {
 	let frame = 1024;
 	let write = Writer(context.destination, {
 		samplesPerFrame: 1024
@@ -34,52 +34,54 @@ test('Writer', function (t) {
 });
 
 
-test('Write AudioBuffer', function (t) {
+t('Write AudioBuffer', function (t) {
 	var write = Writer(context.destination);
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
 	util.noise(buf);
 	write(buf);
+	write(null);
 
 	setTimeout(function () {
-		write(null);
 		t.end();
 	}, 300);
 });
 
-test('Write Float32Array', function (t) {
+t('Write Float32Array', function (t) {
 	var write = Writer(context.destination, {channels: 1});
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
 	util.noise(buf);
 
 	write(buf.getChannelData(0));
+	write(null)
 
 	setTimeout(function () {
-		write(null);
 		t.end();
 	}, 300);
 });
 
-test('Write Array', function (t) {
+t('Write Array', function (t) {
 	var write = Writer(context.destination, {channels: 1});
 
 	var a = Array(1024*8).fill(0).map(function () {return Math.random()});
 
 	write(a);
+	write(null)
 
 	setTimeout(function () {
 		t.end();
 	}, 300);
 });
 
-test('Write ArrayBuffer', function (t) {
+t('Write ArrayBuffer', function (t) {
 	var write = Writer(context.destination, {channels: 1});
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
 	util.noise(buf);
 
 	write(buf.getChannelData(0).buffer);
+	write(null)
 
 	setTimeout(function () {
 		t.end();
@@ -87,8 +89,8 @@ test('Write ArrayBuffer', function (t) {
 });
 
 
-test('Write Buffer', function (t) {
-	var write = Writer(context.destination, {channels: 1});
+t('Write Buffer', function (t) {
+	var write = Writer({channels: 1});
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
 	util.noise(buf);
@@ -96,6 +98,7 @@ test('Write Buffer', function (t) {
 	buf = new Buffer(buf.getChannelData(0).buffer);
 
 	write(buf);
+	write(null)
 
 	setTimeout(function () {
 		t.end();
@@ -103,7 +106,7 @@ test('Write Buffer', function (t) {
 });
 
 
-test('Chain of sound processing', function (t) {
+t('Chain of sound processing', function (t) {
 	var panner = context.createStereoPanner();
 	panner.pan.value = -1;
 	panner.connect(context.destination);
@@ -116,33 +119,17 @@ test('Chain of sound processing', function (t) {
 
 
 	write(generate(util.create(1024*4, 2)))
+	write(null);
 
 	setTimeout(function () {
-		write(null);
 		t.end();
 	}, 500);
 });
 
-test('Delayed connection/start');
+t('Delayed connection/start');
 
 
-test('Bad argument', t => {
-	try {
-		Writer()
-	} catch (e) {
-		t.ok(e)
-	}
-
-	try {
-		Writer([])
-	} catch (e) {
-		t.ok(e)
-		t.end()
-	}
-})
-
-
-test('Should not finish before limit', t => {
+t('Should not finish before limit', t => {
 	let write = Writer(context.destination, {
 		mode: 'buffer'
 	})
@@ -160,11 +147,12 @@ test('Should not finish before limit', t => {
 
 	setTimeout(() => {
 		trigger = true
+		write(null)
 	}, 250)
 })
 
 
-test('End should be called after all data is fed', t => {
+t('End should be called after all data is fed', t => {
 	t.plan(3)
 
 	let write = Writer(context.destination)

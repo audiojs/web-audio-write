@@ -11,7 +11,9 @@ const util = require('audio-buffer-utils')
 const isAudioBuffer = require('is-audio-buffer')
 const AudioBufferList = require('audio-buffer-list')
 const AudioBuffer = require('audio-buffer')
-const assert = require('assert')
+const createContext = require('audio-context')
+const isObj = require('is-plain-obj')
+const pick = require('pick-by-alias')
 
 module.exports = WAAWriter;
 
@@ -21,14 +23,25 @@ module.exports = WAAWriter;
  * @constructor
  */
 function WAAWriter (target, options) {
-	assert(target, 'Pass AudioNode instance first argument')
-	assert(target.context, 'Pass AudioNode instance first')
+	if (!target || isObj(target)) {
+		options = target || {}
+		if (!options.context) options.context = createContext()
+		target = options.context.destination
+	}
+	if (!target.context) throw Error('Pass AudioNode instance first')
 
 	if (!options) {
 		options = {};
 	}
 
 	options.context = target.context;
+
+	options = pick(options, {
+		context: 'context',
+		sampleRate: 'sampleRate rate',
+		channels: 'channels channel numberOfChannels',
+		samplesPerFrame: 'samplesPerFrame length frame block blockSize blockLength frameSize frameLength'
+	})
 
 	options = extend({
 		/**
@@ -119,8 +132,8 @@ function WAAWriter (target, options) {
 	function end () {
 		consume(count)
 		isStopped = true
-		callbackMarks = null
-		callbackQueue = null
+		callbackMarks = []
+		callbackQueue = []
 		node.disconnect()
 	}
 
@@ -238,7 +251,7 @@ function WAAWriter (target, options) {
 	}
 
 
-	//walk over callback stack, invoke according callbacks
+	// walk over callback stack, invoke according callbacks
 	function consume (len) {
 		count -= len
 

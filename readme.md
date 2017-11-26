@@ -33,7 +33,7 @@ setTimeout(() => {
 
 ## API
 
-### `let write = createWriter(destNode, options?)`
+### `let write = createWriter(destNode?, options?)`
 
 Create function writing to web-audio _AudioNode_. The created writer has the following signature: `buf = write(buf, onconsumed?)`. To schedule ending, call `write(null)`. To halt instantly, call `write.end()`.
 
@@ -43,6 +43,8 @@ Create function writing to web-audio _AudioNode_. The created writer has the fol
 * `context` − audio context, by default `destNode.context` is used.
 * `samplesPerFrame` defines processing block size, defaults to 1024
 * `channels` defines expected buffer number of channels, defaults to `destNode.channelCount`.
+
+If `destNode` is not provided, a default `audioContext.destination` is used.
 
 Writer recognizes any type of data sent into it: [AudioBuffer](https://github.com/audiojs/audio-buffer), [AudioBufferList](https://github.com/audiojs/audio-buffer-list), ArrayBuffer, FloatArray, Buffer, Array. `samplesPerFrame` and `channels` are used to convert raw data to AudioBuffer.
 
