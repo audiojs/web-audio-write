@@ -56,3 +56,7 @@ Internally writer uses [audio-buffer-list](https://github.com/audiojs/audio-buff
 * [web-audio-read](https://github.com/audiojs/web-audio-read) — read data from web audio.
 * [web-audio-stream](https://github.com/audiojs/web-audio-stream) — stream interface for web-audio.
 * [pull-web-audio](https://github.com/audiojs/pull-web-audio) — pull-stream interface for web-audio.
+
+## License
+
+(c) 2017 Dmitry Yvanov. MIT License

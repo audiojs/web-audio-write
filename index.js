@@ -14,6 +14,7 @@ const AudioBuffer = require('audio-buffer')
 const createContext = require('audio-context')
 const isObj = require('is-plain-obj')
 const pick = require('pick-by-alias')
+const createBuffer = require('audio-buffer-from')
 
 module.exports = WAAWriter;
 
@@ -39,7 +40,7 @@ function WAAWriter (target, options) {
 	options = pick(options, {
 		context: 'context',
 		sampleRate: 'sampleRate rate',
-		channels: 'channels channel numberOfChannels',
+		channels: 'channels channel numberOfChannels channelCount',
 		samplesPerFrame: 'samplesPerFrame length frame block blockSize blockLength frameSize frameLength'
 	})
 
@@ -59,12 +60,12 @@ function WAAWriter (target, options) {
 		channels: target.channelCount || 2
 	}, options)
 
-	let context = options.context;
-	let channels = options.channels;
-	let samplesPerFrame = options.samplesPerFrame;
-	let sampleRate = context.sampleRate;
+	let {context, channels, samplesPerFrame, sampleRate} = options;
 	let node, isStopped;
-	let silence = new AudioBuffer(context, {length: samplesPerFrame, numberOfChannels: channels})
+	let silence = new AudioBuffer(context, {
+		length: samplesPerFrame,
+		numberOfChannels: channels
+	})
 
 
 	//queued data to send to output
@@ -114,7 +115,10 @@ function WAAWriter (target, options) {
 
 		//push buffer
 		if (!isAudioBuffer(buffer)) {
-			buffer = util.create(buffer, channels)
+			buffer = createBuffer(buffer, {
+				channels,
+				context
+			})
 		}
 
 		count += buffer.length

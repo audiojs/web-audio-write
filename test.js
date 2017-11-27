@@ -74,7 +74,8 @@ t('Write Array', function (t) {
 	}, 300);
 });
 
-t('Write ArrayBuffer', function (t) {
+//FIXME
+t.skip('Write ArrayBuffer', function (t) {
 	var write = Writer(context.destination, {channels: 1});
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
@@ -89,7 +90,7 @@ t('Write ArrayBuffer', function (t) {
 });
 
 
-t('Write Buffer', function (t) {
+t.skip('Write Buffer', function (t) {
 	var write = Writer({channels: 1});
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
