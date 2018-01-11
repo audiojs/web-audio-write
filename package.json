@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "audio-buffer": "^4.0.2",
-    "audio-buffer-list": "^4.1.0",
+    "audio-buffer-list": "^5.0.0",
     "audio-buffer-utils": "^5.1.1",
     "audio-context": "^1.0.1",
     "is-audio-buffer": "^1.0.11",
