@@ -60,6 +60,7 @@ function WAAWriter (target, options) {
 		channels: target.channelCount || 2
 	}, options)
 
+
 	let {context, channels, samplesPerFrame, sampleRate} = options;
 	let node, isStopped;
 	let silence = new AudioBuffer(context, {
@@ -163,10 +164,11 @@ function WAAWriter (target, options) {
 	 * Init scriptProcessor-based rendering.
 	 * Each audioprocess event triggers tick, which releases pipe
 	 */
+
 	function initScriptMode () {
 		//buffer source node
 		let bufferNode = context.createBufferSource()
-		bufferNode.loop = true;
+		bufferNode.loop = true
 		bufferNode.buffer = new AudioBuffer(context, {length: samplesPerFrame, numberOfChannels: channels})
 
 		node = context.createScriptProcessor(samplesPerFrame)
@@ -258,11 +260,12 @@ function WAAWriter (target, options) {
 	// walk over callback stack, invoke according callbacks
 	function consume (len) {
 		count -= len
+		if (count < 0) count = 0;
 
 		if (!callbackMarks.length) return
 
 		for (let i = 0, l = callbackMarks.length; i < l; i++) {
-			callbackMarks[i] -= len
+			callbackMarks[i] = Math.max(callbackMarks[i] - len, 0)
 		}
 
 		while (callbackMarks[0] <= 0) {

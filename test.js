@@ -106,6 +106,9 @@ t.skip('Write Buffer', function (t) {
 	}, 300);
 });
 
+t.skip('writing is longer than samplesPerFrame', function (t) {
+
+})
 
 t('Chain of sound processing', function (t) {
 	var panner = context.createStereoPanner();
