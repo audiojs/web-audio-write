@@ -31,6 +31,7 @@ function WAAWriter (target, options) {
 	}
 	if (!target.context) throw Error('Pass AudioNode instance first')
 
+	if (typeof options === 'number') options = {samplesPerFrame: options}
 	if (!options) {
 		options = {};
 	}
@@ -41,7 +42,7 @@ function WAAWriter (target, options) {
 		context: 'context',
 		sampleRate: 'sampleRate rate',
 		channels: 'channels channel numberOfChannels channelCount',
-		samplesPerFrame: 'samplesPerFrame length frame block blockSize blockLength frameSize frameLength'
+		samplesPerFrame: 'samplesPerFrame length frame size block blockSize blockLength frameSize frameLength'
 	})
 
 	options = extend({
@@ -57,9 +58,8 @@ function WAAWriter (target, options) {
 		mode: 'script',
 		samplesPerFrame: 1024,
 
-		channels: target.channelCount || 2
+		channels: target.channelCount || 1
 	}, options)
-
 
 	let {context, channels, samplesPerFrame, sampleRate} = options;
 	let node, isStopped;
@@ -176,6 +176,7 @@ function WAAWriter (target, options) {
 			if (isStopped) return
 
 			let buf = fetch(e.inputBuffer.length)
+
 			util.copy(buf, e.outputBuffer)
 
 			//measure the moment when we have fed all the data for the last cb
@@ -260,7 +261,10 @@ function WAAWriter (target, options) {
 	// walk over callback stack, invoke according callbacks
 	function consume (len) {
 		count -= len
-		if (count < 0) count = 0;
+		if (count < 0) {
+			count = 0;
+			console.warn('Not enough samples fed for the next data frame. Expected frame is ' + samplesPerFrame + ' samples ' + channels + ' channels')
+		}
 
 		if (!callbackMarks.length) return
 

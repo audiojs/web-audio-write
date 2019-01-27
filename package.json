@@ -26,6 +26,7 @@
   "homepage": "https://github.com/audiojs/web-audio-write#readme",
   "devDependencies": {
     "audio-generator": "^2.1.2",
+    "audio-oscillator": "^3.1.1",
     "tape": "^4.6.3"
   },
   "dependencies": {

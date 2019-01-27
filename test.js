@@ -6,7 +6,7 @@ var Writer = require('./');
 var AudioBuffer = require('audio-buffer');
 var util = require('audio-buffer-utils');
 var Generate = require('audio-generator/direct.js')
-
+var osc = require('audio-oscillator')
 
 
 t('Writer', function (t) {
@@ -106,8 +106,27 @@ t.skip('Write Buffer', function (t) {
 	}, 300);
 });
 
-t.skip('writing is longer than samplesPerFrame', function (t) {
+t.skip('Writing lengthen blocks than samplesPerFrame', function (t) {
 
+})
+
+t('Writing blocks shorter than samplesPerFrame', function (t) {
+	var write = Writer({ channels: 1 })
+
+	let data = osc.sine(1024)
+	let stop = false
+	function tick() {
+		if (stop) return
+		write(osc.sine(data), tick)
+	}
+	tick()
+
+	setTimeout(function () {
+		stop = true
+		write(null)
+	}, 500)
+
+	t.end()
 })
 
 t('Chain of sound processing', function (t) {
