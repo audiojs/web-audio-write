@@ -1,62 +1,51 @@
 # web-audio-write [![Greenkeeper badge](https://badges.greenkeeper.io/audiojs/web-audio-write.svg)](https://greenkeeper.io/) [![stable](https://img.shields.io/badge/stability-unstable-green.svg)](http://github.com/badges/stability-badges)
 
-Send AudioBuffer/Buffer/ArrayBuffer/FloatArray data to web audio.
+Send data to audio context.
 
 ## Usage
 
 [![npm install web-audio-write](https://nodei.co/npm/web-audio-write.png?mini=true)](https://npmjs.org/package/web-audio-write/)
 
 ```js
-const createWriter = require('web-audio-write')
-const createGenerator = require('audio-generator')
+import createWriter from 'web-audio-write'
+import createContext from 'audio-context'
 
-let write = createWriter(context.destination)
-let generate = createGenerator(t => Math.sin(440 * t * Math.PI * 2))
-let stop = false
+const context = createContext()
+const write = createWriter(context.destination)
+const SIZE = 1024, CHANNELS = 2
 
-function tick (err) {
-	if (err) throw err
-	if (stop) {
-		write(null)
-		return
+;(
+	for (let n = 0; n < 10; n++) {
+		// generate planar audio buffer w/noise
+		let data = new Float32Array(CHANNELS * SIZE)
+		for (let i = 0; i < data.length; i++) {
+			data[i] = Math.random() * 2. - 1.
+		}
+
+		// output to speakers
+		await write(data)
 	}
+)();
 
-	//send audio buffer to audio node
-	write(generate(), tick)
-}
-tick()
-
-setTimeout(() => {
-	stop = true
-}, 500)
+// end
+write(null)
 ```
 
 ## API
 
-### `let write = createWriter(destNode?, options?)`
+### `let write = createWriter(destNode=defaultContext)`
 
-Create function writing to web-audio _AudioNode_. The created writer has the following signature: `buf = write(buf, onconsumed?)`. To schedule ending, call `write(null)`. To halt instantly, call `write.end()`.
-
-`options` may provide:
-
-* `mode` − `'script'` or `'buffer'`, defines mode of feeding data, may affect performance insignificantly.
-* `context` − audio context, by default `destNode.context` is used.
-* `samplesPerFrame` defines processing block size, defaults to 1024
-* `channels` defines expected buffer number of channels, defaults to `destNode.channelCount`.
-
-If `destNode` is not provided, a default `audioContext.destination` is used.
-
-Writer recognizes any type of data sent into it: [AudioBuffer](https://github.com/audiojs/audio-buffer), [AudioBufferList](https://github.com/audiojs/audio-buffer-list), ArrayBuffer, FloatArray, Buffer, Array. `samplesPerFrame` and `channels` are used to convert raw data to AudioBuffer.
-
-Internally writer uses [audio-buffer-list](https://github.com/audiojs/audio-buffer-list) to manage memory efficiently, providing lowest possible latency.
-
+Create function writing to web-audio _AudioNode_. The created writer has the following signature: `promise = write(data)`.
+`data` can be either _AudioBuffer_ or _FloatArray_ / _Array_ with planar channels layout with numbers from `-1...+1` range.
+`promise` is resolved when the `data` is consumed.
+To end writing, call `write(null)`.
 
 ## Related
 
 * [web-audio-read](https://github.com/audiojs/web-audio-read) — read data from web audio.
-* [web-audio-stream](https://github.com/audiojs/web-audio-stream) — stream interface for web-audio.
-* [pull-web-audio](https://github.com/audiojs/pull-web-audio) — pull-stream interface for web-audio.
 
 ## License
 
-(c) 2017 Dmitry Yvanov. MIT License
+(c) 2019 audiojs. MIT License
+
+<p align="right">HK</p>

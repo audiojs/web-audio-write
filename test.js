@@ -1,41 +1,31 @@
 'use strict'
 
-var t = require('tape');
-var context = require('audio-context')();
-var Writer = require('./');
-var AudioBuffer = require('audio-buffer');
-var util = require('audio-buffer-utils');
-var Generate = require('audio-generator/direct.js')
-var osc = require('audio-oscillator')
+import t from 'tape'
+import createContext from 'audio-context'
+import createWriter from './src/index'
+// import AudioBuffer from 'audio-buffer'
+// import osc from 'audio-oscillator'
 
 
-t('Writer', function (t) {
-	let frame = 1024;
-	let write = Writer(context.destination, {
-		samplesPerFrame: 1024
-	});
-	let generate = Generate(t => Math.sin(440 * t * Math.PI * 2));
+t.only('basics', async (t) => {
+	const context = createContext({ channels: 1 })
+	const write = await createWriter(context.destination)
 
-	let isStopped = 0;
-	setTimeout(() => {
-		isStopped = 1;
-	}, 500);
-	function gen (err) {
-		if (err) throw err;
-		if (isStopped) {
-			write(null);
-			t.end()
-			return;
-		}
-		let buf = generate(util.create(frame));
-		write(buf, gen);
+	const FRAME = 1024;
+
+
+	for (let i = 0; i < 10; i++) {
+		let data = generate(new Float32Array(FRAME), t => Math.sin(440 * t * Math.PI * 2));
+		await write(data);
 	}
-	gen();
+	write(null);
+
+	t.end()
 });
 
 
 t('Write AudioBuffer', function (t) {
-	var write = Writer(context.destination);
+	var write = createWriter(context.destination);
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
 	util.noise(buf);
@@ -48,7 +38,7 @@ t('Write AudioBuffer', function (t) {
 });
 
 t('Write Float32Array', function (t) {
-	var write = Writer(context.destination, {channels: 1});
+	var write = createWriter(context.destination, {channels: 1});
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
 	util.noise(buf);
@@ -62,7 +52,7 @@ t('Write Float32Array', function (t) {
 });
 
 t('Write Array', function (t) {
-	var write = Writer(context.destination, {channels: 1});
+	var write = createWriter(context.destination, {channels: 1});
 
 	var a = Array(1024*8).fill(0).map(function () {return Math.random()});
 
@@ -76,7 +66,7 @@ t('Write Array', function (t) {
 
 //FIXME
 t.skip('Write ArrayBuffer', function (t) {
-	var write = Writer(context.destination, {channels: 1});
+	var write = createWriter(context.destination, {channels: 1});
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
 	util.noise(buf);
@@ -91,7 +81,7 @@ t.skip('Write ArrayBuffer', function (t) {
 
 
 t.skip('Write Buffer', function (t) {
-	var write = Writer({channels: 1});
+	var write = createWriter({channels: 1});
 
 	var buf = new AudioBuffer(context, {length: 1024*8});
 	util.noise(buf);
@@ -111,7 +101,7 @@ t.skip('Writing lengthen blocks than samplesPerFrame', function (t) {
 })
 
 t('Writing blocks shorter than samplesPerFrame', function (t) {
-	var write = Writer({ channels: 1 })
+	var write = createWriter({ channels: 1 })
 
 	let data = osc.sine(1024)
 	let stop = false
@@ -134,7 +124,7 @@ t('Chain of sound processing', function (t) {
 	panner.pan.value = -1;
 	panner.connect(context.destination);
 
-	var write = Writer(panner);
+	var write = createWriter(panner);
 
 	var generate = Generate(function (time) {
 		return Math.sin(Math.PI * 2 * 440 * time);
@@ -153,7 +143,7 @@ t('Delayed connection/start');
 
 
 t('Should not finish before limit', t => {
-	let write = Writer(context.destination, {
+	let write = createWriter(context.destination, {
 		mode: 'buffer'
 	})
 
@@ -178,7 +168,7 @@ t('Should not finish before limit', t => {
 t('End should be called after all data is fed', t => {
 	t.plan(3)
 
-	let write = Writer(context.destination)
+	let write = createWriter(context.destination)
 
 	let buf = util.create(4410)
 	util.noise(buf)
@@ -200,3 +190,13 @@ t('End should be called after all data is fed', t => {
 		trigger = true
 	}, 50)
 })
+
+let c = 0
+function generate (arr, fn) {
+	for (let i = 0; i < arr.length; i++) {
+		let t = c / 44100
+		arr[i] = fn(t)
+		c++
+	}
+	return arr
+}
