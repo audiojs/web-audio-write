@@ -3,6 +3,7 @@
 import t from 'tape'
 import createContext from 'audio-context'
 import createWriter from './src/index'
+import { time } from 'wait-please'
 // import AudioBuffer from 'audio-buffer'
 // import osc from 'audio-oscillator'
 
@@ -14,11 +15,13 @@ t.only('basics', async (t) => {
 	const FRAME = 1024;
 
 
-	for (let i = 0; i < 10; i++) {
+	for (let i = 0; i < 40; i++) {
 		let data = generate(new Float32Array(FRAME), t => Math.sin(440 * t * Math.PI * 2));
 		await write(data);
 	}
 	write(null);
+
+	await time(1000)
 
 	t.end()
 });
@@ -194,7 +197,7 @@ t('End should be called after all data is fed', t => {
 let c = 0
 function generate (arr, fn) {
 	for (let i = 0; i < arr.length; i++) {
-		let t = c / 44100
+		let t = c / 48000
 		arr[i] = fn(t)
 		c++
 	}

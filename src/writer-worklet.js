@@ -1,16 +1,16 @@
-// class WriteProcessor extends AudioWorkletProcessor {
-//   process(is, os) {
-//     const i = is[0], o = os[0];
-//     for (let c = 0; c < i.length; c++) {
-//       const ic = i[c], oc = o[c];
-//       for (let i = 0; i < ic.length; i++) {
-//         oc[i] = ic[i];
-//       }
-//     }
-//   }
-// }
+class Writer extends AudioWorkletProcessor {
+  process(is, os) {
+    const i = is[0], o = os[0];
+    for (let c = 0; c < i.length; c++) {
+      const ic = i[c], oc = o[c];
+      for (let i = 0; i < ic.length; i++) {
+        oc[i] = ic[i];
+      }
+    }
+  }
+}
 
-// registerProcessor('writer-worklet', WriteProcessor)
+registerProcessor('writer-worklet', Writer)
 
 class BypassProcessor extends AudioWorkletProcessor {
 
