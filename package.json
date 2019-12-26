@@ -28,8 +28,7 @@
   "homepage": "https://github.com/audiojs/web-audio-write#readme",
   "devDependencies": {
     "parcel": "^1.12.4",
-    "parcel-plugin-import-as-url": "^1.0.0",
-    "tape": "^4.12.0"
+    "tst": "^5.0.11"
   },
   "dependencies": {
     "audio-context": "^1.0.3",

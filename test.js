@@ -1,6 +1,6 @@
 'use strict'
 
-import t from 'tape'
+import t from 'tst'
 import createContext from 'audio-context'
 import createWriter from './src/index'
 import { time } from 'wait-please'
@@ -12,11 +12,18 @@ t.only('basic', async (t) => {
 	const context = createContext(3)
 	const write = await createWriter(context.destination)
 
-	const FRAME = 1024, N = 20
+	const FRAME = 1024, N = 20, CHANNELS = 2
 
 	let consumed = 0
+	let generators = [
+		createGenerator(context.sampleRate, t => Math.sin(440 * t * Math.PI * 2)),
+		createGenerator(context.sampleRate, t => Math.sin(440 * t * Math.PI * 2))
+	]
+
 	for (let i = 0; i < N; i++) {
-		let data = generate(new Float32Array(FRAME), t => Math.sin(440 * t * Math.PI * 2));
+		let data = new Float32Array(FRAME * CHANNELS)
+		generators[0](data.subarray(0, FRAME))
+		generators[1](data.subarray(FRAME))
 		await write(data).then(e => (consumed += e.data))
 	}
 	await write(null)
@@ -205,12 +212,14 @@ t('End should be called after all data is fed', t => {
 	}, 50)
 })
 
-let c = 0
-function generate (arr, fn) {
-	for (let i = 0; i < arr.length; i++) {
-		let t = c / 48000
-		arr[i] = fn(t)
-		c++
+function createGenerator (sampleRate, fn) {
+	let c = 0
+	return (arr) => {
+		for (let i = 0; i < arr.length; i++) {
+			let t = c / sampleRate
+			arr[i] = fn(t)
+			c++
+		}
+		return arr
 	}
-	return arr
 }

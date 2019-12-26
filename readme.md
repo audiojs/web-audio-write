@@ -28,7 +28,7 @@ function noise (frame=1024, channels=2) {
 
 ### `write = createWriter(audioNode: AudioNode = defaultContext.destination)`
 
-Create a function writing to `audioNode`. Created writer can consume _FloatArray_, _Array_ or _ArrayBuffer_ with planar channels layout with numbers from `-1...+1` range. Each `write` call returns a promise that is resolved when data chunk is being consumed, allowing scheduling subsequent calls. To end writing, call `write(null)`.
+Create a function writing to `audioNode`. Created writer can consume _FloatArray_, _Array_ or _ArrayBuffer_ with planar channels layout with numbers from `-1...+1` range. Each `write` call returns a promise that is resolved when data chunk is being consumed, allowing scheduling subsequent calls. To end writing, call `write(null)`. `write.node` exposes underneath node used t oprocess data.
 
 ## Related
 
