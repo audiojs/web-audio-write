@@ -3,7 +3,7 @@ import createContext from 'audio-context';
 
 
 // to be sync-api compatible, it creates worklet lazily
-export default async function createWriter (dest = createContext().destination) {
+export default function createWriter (dest = createContext().destination) {
   const context = dest.context
 
   const workletURL = URL.createObjectURL(new Blob([`
@@ -61,20 +61,37 @@ export default async function createWriter (dest = createContext().destination) 
     })
   `], { type: 'text/javascript' }));
 
-  await context.audioWorklet.addModule(workletURL);
-  const writer = new AudioWorkletNode(context, 'writer-worklet');
-  const listeners = []
-  writer.port.onmessage = e => {
-    listeners.shift()(e)
-    if (e.data === null) writer.closed = true
-  }
-  writer.connect(dest)
+  let writer, listeners, init
 
-  return (data) => {
+  init = context.audioWorklet.addModule(workletURL).then(() => {
+    init = null
+    writer = new AudioWorkletNode(context, 'writer-worklet')
+    listeners = []
+    writer.port.onmessage = e => {
+      listeners.shift()(e)
+      if (e.data === null) writer.closed = true
+    }
+    writer.connect(dest)
+    return write
+  })
+
+  function push(data) {
     if (writer.closed) throw Error('Writer is closed')
     return new Promise(resolve => {
       listeners.push(resolve)
       writer.port.postMessage(data)
     })
   }
+
+  // to make API sync, first consuming awaits for init
+  function write (data) {
+    if (write.then) write.then = null
+    return init ? init.then(() => push(data)) : push(data)
+  }
+  write.then = (fn) => {
+    write.then = null
+    init.then(() => fn(write))
+  }
+
+  return write
 }
