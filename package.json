@@ -2,12 +2,14 @@
   "name": "web-audio-write",
   "version": "1.3.3",
   "description": "Send data to web-audio",
-  "main": "./index.js",
+  "main": "./src/index.js",
   "scripts": {
-    "lint": "eslint *.js --ignore-pattern test*",
     "test": "echo No tests for node available",
-    "test:browser": "budo test.js"
+    "start": "parcel serve --no-hmr test.html"
   },
+  "browserslist": [
+    "last 1 Chrome versions"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/audiojs/web-audio-write.git"
@@ -25,18 +27,14 @@
   },
   "homepage": "https://github.com/audiojs/web-audio-write#readme",
   "devDependencies": {
-    "audio-generator": "^2.1.2",
-    "audio-oscillator": "^3.1.1",
-    "tape": "^4.6.3"
+    "audio-buffer": "^4.0.4",
+    "audio-buffer-utils": "^5.1.2",
+    "parcel": "^1.12.4",
+    "tst": "^5.0.11"
   },
   "dependencies": {
-    "audio-buffer": "^4.0.2",
-    "audio-buffer-list": "^4.1.0",
-    "audio-buffer-utils": "^5.1.1",
-    "audio-context": "^1.0.1",
-    "is-audio-buffer": "^1.0.11",
-    "is-plain-obj": "^2.0.0",
-    "object-assign": "^4.1.1",
-    "pick-by-alias": "^1.2.0"
+    "audio-context": "^1.0.3",
+    "audioworklet-polyfill": "^1.1.2",
+    "wait-please": "^2.0.1"
   }
 }
