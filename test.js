@@ -1,5 +1,3 @@
-'use strict'
-
 import t from 'tst'
 import createContext from 'audio-context'
 import createWriter from './src/index'
@@ -38,13 +36,6 @@ t('basic', async (t) => {
 	t.end()
 });
 
-t.skip('overfeeding', async t => {
-	t.end()
-})
-
-t.skip('underfeeding', async t => {
-	t.end()
-})
 
 t('Write AudioBuffer', async (t) => {
 	var context = createContext()
@@ -53,79 +44,13 @@ t('Write AudioBuffer', async (t) => {
 
 	var buf = new AudioBuffer(context, { length: 1024 * 10 });
 	util.noise(buf);
-	await write(buf);
-	write(null);
+	write(buf);
+	await write(null);
 
-	await time(200)
 	t.end()
 });
 
-t('Write Float32Array', function (t) {
-	var context = createContext()
-
-	var write = createWriter(context.destination, {channels: 1});
-
-	var buf = new AudioBuffer(context, {length: 1024 * 8});
-	util.noise(buf);
-
-	write(buf.getChannelData(0));
-	write(null)
-
-	setTimeout(function () {
-		t.end();
-	}, 300);
-});
-
-t('Write Array', function (t) {
-	var write = createWriter(context.destination, {channels: 1});
-
-	var a = Array(1024*8).fill(0).map(function () {return Math.random()});
-
-	write(a);
-	write(null)
-
-	setTimeout(function () {
-		t.end();
-	}, 300);
-});
-
-//FIXME
-t.skip('Write ArrayBuffer', function (t) {
-	var write = createWriter(context.destination, {channels: 1});
-
-	var buf = new AudioBuffer(context, {length: 1024*8});
-	util.noise(buf);
-
-	write(buf.getChannelData(0).buffer);
-	write(null)
-
-	setTimeout(function () {
-		t.end();
-	}, 300);
-});
-
-
-t.skip('Write Buffer', function (t) {
-	var write = createWriter({channels: 1});
-
-	var buf = new AudioBuffer(context, {length: 1024*8});
-	util.noise(buf);
-
-	buf = new Buffer(buf.getChannelData(0).buffer);
-
-	write(buf);
-	write(null)
-
-	setTimeout(function () {
-		t.end();
-	}, 300);
-});
-
-t.skip('Writing lengthen blocks than samplesPerFrame', function (t) {
-
-})
-
-t('Writing blocks shorter than samplesPerFrame', function (t) {
+t.skip('Writing short blocks', function (t) {
 	var write = createWriter({ channels: 1 })
 
 	let data = osc.sine(1024)
@@ -144,7 +69,7 @@ t('Writing blocks shorter than samplesPerFrame', function (t) {
 	t.end()
 })
 
-t('Chain of sound processing', function (t) {
+t.skip('Chain of sound processing', function (t) {
 	var panner = context.createStereoPanner();
 	panner.pan.value = -1;
 	panner.connect(context.destination);
@@ -164,10 +89,10 @@ t('Chain of sound processing', function (t) {
 	}, 500);
 });
 
-t('Delayed connection/start');
+t.skip('Delayed connection/start');
 
 
-t('Should not finish before limit', t => {
+t.skip('Should not finish before limit', t => {
 	let write = createWriter(context.destination, {
 		mode: 'buffer'
 	})
@@ -190,7 +115,7 @@ t('Should not finish before limit', t => {
 })
 
 
-t('End should be called after all data is fed', t => {
+t.skip('End should be called after all data is fed', t => {
 	t.plan(3)
 
 	let write = createWriter(context.destination)
