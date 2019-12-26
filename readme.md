@@ -26,16 +26,16 @@ function noise (frame=1024, channels=2) {
 
 ## API
 
-#### `write = createWriter(audioNode: AudioNode = defaultContext.destination)`
+#### `write = createWriter(destination: AudioNode = defaultContext.destination)`
 
-Create a function, writing any data to any `AudioNode`. Channel number and sample rate is derived from `audioNode`.
+Create a function, writing any data to an _AudioNode_. Channel number and sample rate is derived from `destination`.
 
 #### `promise = write(samples)`
 
 Send data to destination node.
 `samples` can be _AudioBuffer_, _Array_ of _Arrays_, _FloatArray_, _Array_ or _ArrayBuffer_ with planar channels layout, with numbers ranging from `-1...+1`.
-`promise` is resolved when data chunk is going to be fully consumed, that's a good place to feed more data.
-`write(null)` ends writing, skipping the reset of data in the buffer.
+`promise` is resolved when data chunk is started being consumed, that's a good place to feed more data.
+`write(null)` schedules end of writing.
 `write.node` exposes worklet web-audio node.
 
 ## Related
