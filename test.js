@@ -8,24 +8,35 @@ import { time } from 'wait-please'
 // import osc from 'audio-oscillator'
 
 
-t.only('basics', async (t) => {
+t.only('basic', async (t) => {
 	const context = createContext({ channels: 1 })
 	const write = await createWriter(context.destination)
 
-	const FRAME = 1024;
+	const FRAME = 1024, N = 20
 
-
-	for (let i = 0; i < 40; i++) {
+	let consumed = 0
+	for (let i = 0; i < N; i++) {
 		let data = generate(new Float32Array(FRAME), t => Math.sin(440 * t * Math.PI * 2));
-		await write(data);
+		await write(data).then(e => (consumed += e.data))
 	}
-	write(null);
+	await write(null)
 
-	await time(1000)
+	t.equal(consumed, FRAME * N, 'consumed number of samples is purrfæct')
+
+	t.throws(() => {
+		write([])
+	})
 
 	t.end()
 });
 
+t.skip('overfeeding', async t => {
+	t.end()
+})
+
+t.skip('underfeeding', async t => {
+	t.end()
+})
 
 t('Write AudioBuffer', function (t) {
 	var write = createWriter(context.destination);

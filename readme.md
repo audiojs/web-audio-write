@@ -1,6 +1,6 @@
 # web-audio-write [![Greenkeeper badge](https://badges.greenkeeper.io/audiojs/web-audio-write.svg)](https://greenkeeper.io/) [![stable](https://img.shields.io/badge/stability-unstable-green.svg)](http://github.com/badges/stability-badges)
 
-Send data to audio context.
+Send samples data to ∀ web-audio node.
 
 ## Usage
 
@@ -8,37 +8,27 @@ Send data to audio context.
 
 ```js
 import createWriter from 'web-audio-write'
-import createContext from 'audio-context'
 
-const context = createContext()
-const write = createWriter(context.destination)
-const SIZE = 1024, CHANNELS = 2
+const context = new AudioContext()
+const write = createWriter(context)
 
-;(
-	for (let n = 0; n < 10; n++) {
-		// generate planar audio buffer w/noise
-		let data = new Float32Array(CHANNELS * SIZE)
-		for (let i = 0; i < data.length; i++) {
-			data[i] = Math.random() * 2. - 1.
-		}
-
-		// output to speakers
-		await write(data)
-	}
-)();
-
-// end
+for (let n = 0; n < 10; n++) await write(noise())
 write(null)
+
+function noise (frame=1024, channels=2) {
+	let data = new Float32Array(channels * frame)
+	for (let i = 0; i < data.length; i++) {
+		data[i] = Math.random() * 2. - 1.
+	}
+	return data
+}
 ```
 
 ## API
 
-### `let write = createWriter(destNode=defaultContext)`
+### `write = createWriter(audioNode: AudioNode = defaultContext.destination)`
 
-Create function writing to web-audio _AudioNode_. The created writer has the following signature: `promise = write(data)`.
-`data` can be either _AudioBuffer_ or _FloatArray_ / _Array_ with planar channels layout with numbers from `-1...+1` range.
-`promise` is resolved when the `data` is consumed.
-To end writing, call `write(null)`.
+Create a function writing to `audioNode`. Created writer can consume _FloatArray_, _Array_ or _ArrayBuffer_ with planar channels layout with numbers from `-1...+1` range. Each `write` call returns a promise that is resolved when data chunk is being consumed, allowing scheduling subsequent calls. To end writing, call `write(null)`.
 
 ## Related
 
