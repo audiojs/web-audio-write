@@ -6,6 +6,7 @@ import createContext from 'audio-context';
 export default function createWriter (dest = createContext().destination) {
   const context = dest.context
 
+  // FIXME: move worklet into a separate file
   const workletURL = URL.createObjectURL(new Blob([`
     registerProcessor('writer-worklet', class extends AudioWorkletProcessor {
       constructor() {
