@@ -10,7 +10,7 @@ Send samples data to ∀ web-audio node.
 import createWriter from 'web-audio-write'
 
 const context = new AudioContext()
-const write = await createWriter(context) // await is optional
+const write = await createWriter(context.destination) // await is optional
 
 for (let n = 0; n < 10; n++) await write(noise())
 write(null)
@@ -30,10 +30,10 @@ function noise (frame=1024, channels=2) {
 
 Create a function, writing any data to an _AudioNode_. Channel number and sample rate is derived from `destination`.
 
-#### `promise = write(samples)`
+#### `p: Promise = write(samples: number[] | array[] | AudioBuffer | ArrayBuffer )`
 
 Send data to destination node.
-`samples` can be _AudioBuffer_, _Array_ of _Arrays_, _FloatArray_, _Array_ or _ArrayBuffer_ with planar channels layout, with numbers ranging from `-1...+1`.
+`samples` can be flat array with planar channels layout or list of arrays, with numbers ranging from `-1...+1`.
 `promise` is resolved when data chunk is started being consumed, that's a good place to feed more data.
 `write(null)` schedules end of writing.
 `write.node` exposes worklet web-audio node.
