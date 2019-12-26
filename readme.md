@@ -10,7 +10,7 @@ Send samples data to ∀ web-audio node.
 import createWriter from 'web-audio-write'
 
 const context = new AudioContext()
-const write = createWriter(context)
+const write = await createWriter(context) // await is optional
 
 for (let n = 0; n < 10; n++) await write(noise())
 write(null)

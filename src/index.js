@@ -10,6 +10,7 @@ export default function createWriter (dest = createContext().destination) {
     registerProcessor('writer-worklet', class extends AudioWorkletProcessor {
       constructor() {
         super()
+        this.channels = 2
         this.queue = []
         this.end = false
         this.current = null
@@ -61,25 +62,25 @@ export default function createWriter (dest = createContext().destination) {
     })
   `], { type: 'text/javascript' }));
 
-  let writer, listeners, init
+  let listeners, init
 
   init = context.audioWorklet.addModule(workletURL).then(() => {
     init = null
-    writer = new AudioWorkletNode(context, 'writer-worklet')
+    write.writerNode = new AudioWorkletNode(context, 'writer-worklet')
     listeners = []
-    writer.port.onmessage = e => {
+    write.writerNode.port.onmessage = e => {
       listeners.shift()(e)
-      if (e.data === null) writer.closed = true
+      if (e.data === null) write.writerNode.closed = true
     }
-    writer.connect(dest)
+    write.writerNode.connect(dest)
     return write
   })
 
   function push(data) {
-    if (writer.closed) throw Error('Writer is closed')
+    if (write.writerNode.closed) throw Error('Writer is closed')
     return new Promise(resolve => {
       listeners.push(resolve)
-      writer.port.postMessage(data)
+      write.writerNode.port.postMessage(data)
     })
   }
 

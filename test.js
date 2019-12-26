@@ -9,8 +9,8 @@ import { time } from 'wait-please'
 
 
 t.only('basic', async (t) => {
-	const context = createContext({ channels: 1 })
-	const write = createWriter(context.destination)
+	const context = createContext(3)
+	const write = await createWriter(context.destination)
 
 	const FRAME = 1024, N = 20
 
