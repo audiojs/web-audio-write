@@ -4,11 +4,12 @@ import t from 'tst'
 import createContext from 'audio-context'
 import createWriter from './src/index'
 import { time } from 'wait-please'
-// import AudioBuffer from 'audio-buffer'
+import AudioBuffer from 'audio-buffer'
+import util from 'audio-buffer-utils'
 // import osc from 'audio-oscillator'
 
 
-t.only('basic', async (t) => {
+t('basic', async (t) => {
 	const context = createContext(3)
 	const write = await createWriter(context.destination)
 
@@ -45,23 +46,26 @@ t.skip('underfeeding', async t => {
 	t.end()
 })
 
-t('Write AudioBuffer', function (t) {
+t('Write AudioBuffer', async (t) => {
+	var context = createContext()
+
 	var write = createWriter(context.destination);
 
-	var buf = new AudioBuffer(context, {length: 1024*8});
+	var buf = new AudioBuffer(context, { length: 1024 * 10 });
 	util.noise(buf);
-	write(buf);
+	await write(buf);
 	write(null);
 
-	setTimeout(function () {
-		t.end();
-	}, 300);
+	await time(200)
+	t.end()
 });
 
 t('Write Float32Array', function (t) {
+	var context = createContext()
+
 	var write = createWriter(context.destination, {channels: 1});
 
-	var buf = new AudioBuffer(context, {length: 1024*8});
+	var buf = new AudioBuffer(context, {length: 1024 * 8});
 	util.noise(buf);
 
 	write(buf.getChannelData(0));

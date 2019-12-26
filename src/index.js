@@ -27,26 +27,21 @@ export default function createWriter (dest = createContext().destination) {
         const input = inputs[0], output = outputs[0];
         const channels = output.length
 
-        // end is abrupt here, it does not wait for all planned data to be consumed
-        // FIXME: mb it is better to finish this.current?
-        if (this.end) {
-          while (this.queue.shift()) this.port.postMessage(null)
-          this.port.postMessage(null)
-          return false
-        }
-
         let remains = output[0].length
         while (remains > 0) {
           // get new chunk from queue
           if (!this.current) {
-            let data = this.queue.shift()
-            if (!data) break
-            this.current = []
-            let len = Math.floor(data.length / channels)
-            for (let channel = 0; channel < channels; channel++) {
-              this.current[channel] = data.subarray(channel * len, channel * len + len)
+            if (this.current = this.queue.shift()) {
+              this.port.postMessage(this.current[0].length)
             }
-            this.port.postMessage(this.current[0].length)
+            else {
+              if (this.end) {
+                this.port.postMessage(null)
+                return false
+              }
+              this.port.postMessage(0)
+              break
+            }
           }
           if (this.current[0].length > remains) {
             for (let channel = 0; channel < channels; channel++) {
@@ -87,9 +82,27 @@ export default function createWriter (dest = createContext().destination) {
 
   function push(data) {
     if (write.node.closed) throw Error('Writer is closed')
+
+    let arr = data
+    if (data) {
+      if (data.getChannelData) {
+        arr = []
+        for (let c = 0; c < dest.channelCount; c++) {
+          arr[c] = c < data.numberOfChannels ? data.getChannelData(c) : new Float32Array()
+        }
+      }
+      else if (typeof data[0] === 'number') {
+        arr = []
+        let len = Math.floor(data.length / dest.channelCount)
+        for (let c = 0; c < dest.channelCount; c++) {
+          arr[c] = data.subarray ? data.subarray(c * len, c * len + len) : new Float32Array(data.slice(c * len, c * len + len))
+        }
+      }
+    }
+
     return new Promise(resolve => {
       listeners.push(resolve)
-      write.node.port.postMessage(data)
+      write.node.port.postMessage(arr)
     })
   }
 
