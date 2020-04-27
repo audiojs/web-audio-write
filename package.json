@@ -31,7 +31,7 @@
     "audio-buffer-utils": "^5.1.2",
     "parcel": "^1.12.4",
     "tst": "^5.0.11",
-    "wait-please": "^3.0.0"
+    "wait-please": "^3.1.0"
   },
   "dependencies": {
     "audio-context": "^1.0.3",
