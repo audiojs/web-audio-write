@@ -1,4 +1,4 @@
-# web-audio-write [![stable](https://img.shields.io/badge/stability-stable-green.svg)](http://github.com/badges/stability-badges)
+# web-audio-write [![unstable](https://img.shields.io/badge/stability-unstable-green.svg)](http://github.com/badges/stability-badges)
 
 Write data to any web-audio node.
 
