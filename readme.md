@@ -1,4 +1,4 @@
-# web-audio-write [![Greenkeeper badge](https://badges.greenkeeper.io/audiojs/web-audio-write.svg)](https://greenkeeper.io/) [![stable](https://img.shields.io/badge/stability-unstable-green.svg)](http://github.com/badges/stability-badges)
+# web-audio-write [![stable](https://img.shields.io/badge/stability-stable-green.svg)](http://github.com/badges/stability-badges)
 
 Write data to any web-audio node.
 
