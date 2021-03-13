@@ -1,5 +1,4 @@
 import 'audioworklet-polyfill'
-import createContext from 'audio-context';
 
 // FIXME: move worklet into a separate file
 const workletURL = URL.createObjectURL(new Blob([`
@@ -8,6 +7,7 @@ const workletURL = URL.createObjectURL(new Blob([`
       super()
       this.queue = []
       this.end = false
+      // current part being consumed
       this.current = null
       this.port.onmessage = e => {
         if (e.data === null) {
@@ -39,15 +39,15 @@ const workletURL = URL.createObjectURL(new Blob([`
           }
         }
         if (this.current[0].length > remains) {
-          for (let channel = 0; channel < channels; channel++) {
-            output[channel].set(this.current[channel].subarray(0, remains), output[channel].length - remains)
-            this.current[channel] = this.current[channel].subarray(remains)
+          for (let c = 0; c < channels; c++) {
+            output[c].set(this.current[c].subarray(0, remains), output[c].length - remains)
+            this.current[c] = this.current[c].subarray(remains)
           }
           remains = 0
         }
         else {
-          for (let channel = 0; channel < channels; channel++) {
-            output[channel].set(this.current[channel], output[channel].length - remains)
+          for (let c = 0; c < channels; c++) {
+            output[c].set(this.current[c], output[c].length - remains)
           }
           remains -= this.current[0].length
           this.current = null
@@ -59,17 +59,15 @@ const workletURL = URL.createObjectURL(new Blob([`
 `], { type: 'text/javascript' }));
 
 // to be sync-api compatible, it creates worklet lazily
-export default function createWriter (dest = createContext().destination) {
+export default function createWriter (dest) {
+  if (!dest) dest = (new AudioContext).destination
   const context = dest.context
 
   let listeners
 
   let init = context.audioWorklet.addModule(workletURL).then(() => {
     init = null
-    createNode()
-  })
 
-  function createNode() {
     write.node = new AudioWorkletNode(context, 'writer-worklet', {
       outputChannelCount: [dest.channelCount]
     })
@@ -80,7 +78,16 @@ export default function createWriter (dest = createContext().destination) {
     }
     write.node.connect(dest)
     write.node.write = write
-    return write
+  })
+
+  // to make API sync, first consuming awaits for init
+  function write (data) {
+    if (write.then) write.then = null
+    return init ? init.then(() => push(data)) : push(data)
+  }
+  write.then = (fn) => {
+    write.then = null
+    init.then(() => fn(write))
   }
 
   function push(data) {
@@ -107,16 +114,6 @@ export default function createWriter (dest = createContext().destination) {
       listeners.push(resolve)
       write.node.port.postMessage(arr)
     })
-  }
-
-  // to make API sync, first consuming awaits for init
-  function write (data) {
-    if (write.then) write.then = null
-    return init ? init.then(() => push(data)) : push(data)
-  }
-  write.then = (fn) => {
-    write.then = null
-    init.then(() => fn(write))
   }
 
   return write

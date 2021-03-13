@@ -1,6 +1,6 @@
 # web-audio-write [![Greenkeeper badge](https://badges.greenkeeper.io/audiojs/web-audio-write.svg)](https://greenkeeper.io/) [![stable](https://img.shields.io/badge/stability-unstable-green.svg)](http://github.com/badges/stability-badges)
 
-Send samples data to ∀ web-audio node.
+Write data to any web-audio node.
 
 ## Usage
 
@@ -10,10 +10,10 @@ Send samples data to ∀ web-audio node.
 import createWriter from 'web-audio-write'
 
 const context = new AudioContext()
-const write = await createWriter(context.destination) // await is optional
+const write = createWriter(context.destination)
 
 for (let n = 0; n < 10; n++) await write(noise())
-write(null)
+write.end()
 
 function noise (frame=1024, channels=2) {
 	let data = new Float32Array(channels * frame)
@@ -26,17 +26,23 @@ function noise (frame=1024, channels=2) {
 
 ## API
 
-#### `write = createWriter(destination: AudioNode = defaultContext.destination)`
+#### `write = createWriter(node = audioContext.destination)`
 
-Create a function, writing any data to an _AudioNode_. Channel number and sample rate is derived from `destination`.
+Create a function, writing any data to any _AudioNode_. Channel number and sample rate is derived from destination `node`.
 
-#### `p: Promise = write(samples: number[] | array[] | AudioBuffer | ArrayBuffer )`
+#### `[async] write(samples)`
 
-Send data to destination node.
-`samples` can be flat array with planar channels layout or list of arrays, with numbers ranging from `-1...+1`.
-`promise` is resolved when data chunk is started being consumed, that's a good place to feed more data.
-`write(null)` schedules end of writing.
-`write.node` exposes worklet web-audio node.
+Send data to the destination `node`.
+`samples` can be an array with planar channels layout or a list of arrays, with floats in `-1...+1` range.
+Returns `promise` that is resolved when data chunk is being consumed, that's a good place to feed more data.
+
+#### `write(null)`
+
+Schedules end of writing.
+
+#### `write.node`
+
+Exposes worklet web-audio node.
 
 ## Related
 
@@ -46,4 +52,4 @@ Send data to destination node.
 
 (c) 2019 audiojs. MIT License
 
-<p align="right">HK</p>
+<p align="right">ॐ</p>

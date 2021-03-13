@@ -1,11 +1,10 @@
 {
   "name": "web-audio-write",
   "version": "2.0.1",
-  "description": "Send data to web-audio",
-  "main": "./src/index.js",
+  "description": "Send data to a web audio node",
+  "main": "./index.js",
   "scripts": {
-    "test": "echo No tests for node available",
-    "start": "parcel serve --no-hmr test.html"
+    "start": "esbuild test.js --bundle --sourcemap --outfile=bundle.js --serve=8000"
   },
   "browserslist": [
     "last 1 Chrome versions"
@@ -27,14 +26,9 @@
   },
   "homepage": "https://github.com/audiojs/web-audio-write#readme",
   "devDependencies": {
-    "audio-buffer": "^4.0.4",
-    "audio-buffer-utils": "^5.1.2",
-    "parcel": "^1.12.4",
-    "tst": "^5.0.11",
-    "wait-please": "^3.0.0"
+    "tst": "^6.1.1"
   },
   "dependencies": {
-    "audio-context": "^1.0.3",
     "audioworklet-polyfill": "^1.1.2"
   }
 }

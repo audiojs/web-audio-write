@@ -1,14 +1,17 @@
 import t from 'tst'
-import createContext from 'audio-context'
-import createWriter from './src/index'
-import { time } from 'wait-please'
-import AudioBuffer from 'audio-buffer'
-import util from 'audio-buffer-utils'
-// import osc from 'audio-oscillator'
+import createWriter from './index.js'
+
+let interaction = new Promise((resolve) => {
+	console.log('Click to start tests')
+	document.addEventListener('click', resolve)
+	document.addEventListener('keydown', resolve)
+	document.addEventListener('touchstart', resolve)
+})
 
 
 t('basic', async (t) => {
-	const context = createContext(3)
+	await interaction
+	const context = new AudioContext()
 	const write = await createWriter(context.destination)
 
 	const FRAME = 1024, N = 20, CHANNELS = 2
@@ -27,23 +30,22 @@ t('basic', async (t) => {
 	}
 	await write(null)
 
-	t.equal(consumed, FRAME * N, 'consumed number of samples is purrfæct')
+	t.is(consumed, FRAME * N, 'consumed number of samples is purrfæct')
 
 	t.throws(() => {
 		write([])
 	})
-
-	t.end()
 });
 
 
 t('write AudioBuffer', async (t) => {
-	var context = createContext()
+	await interaction
+	var context = new AudioContext()
 
 	var write = createWriter(context.destination);
 
-	var buf = new AudioBuffer(context, { length: 1024 * 10 });
-	util.noise(buf);
+	var buf = new AudioBuffer({ sampleRate: context.sampleRate, numberOfChannels: 2, length: 1024 * 10 });
+	for (let c = 0; c < buf.numberOfChannels; c++) for (let i = 0; i < buf.length; i++) { buf.getChannelData(c)[i] = Math.random() * 2 - 1 }
 	write(buf);
 	await write(null);
 
@@ -51,7 +53,8 @@ t('write AudioBuffer', async (t) => {
 });
 
 t('chain of sound processing', async (t) => {
-	var context = createContext()
+	await interaction
+	var context = new AudioContext()
 
 	var panner = context.createStereoPanner();
 	panner.pan.value = -1;
