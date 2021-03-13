@@ -30,7 +30,7 @@ function noise (frame=1024, channels=2) {
 
 Create a function, writing any data to any _AudioNode_. Channel number and sample rate is derived from destination `node`.
 
-#### `[async] write(samples)`
+#### `async write(samples)`
 
 Send data to the destination `node`.
 `samples` can be an array with planar channels layout or a list of arrays, with floats in `-1...+1` range.
