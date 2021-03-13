@@ -52,4 +52,4 @@ Exposes worklet web-audio node.
 
 (c) 2019 audiojs. MIT License
 
-<p align="right">ॐ</p>
+<p align="center">ॐ</p>
