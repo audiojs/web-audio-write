@@ -5,52 +5,33 @@ const workletURL = URL.createObjectURL(new Blob([`
   registerProcessor('writer-worklet', class extends AudioWorkletProcessor {
     constructor() {
       super()
-      this.queue = []
+      this.q = []
       this.end = false
-      // current part being consumed
-      this.current = null
-      this.port.onmessage = e => {
-        if (e.data === null) {
-          this.end = true
-        }
-        else {
-          this.queue.push(e.data)
-        }
-      }
+      this.cur = null
+      this.port.onmessage = e => e.data === null ? this.end = true : this.q.push(e.data)
     }
-    process(inputs, outputs) {
-      const input = inputs[0], output = outputs[0];
-      const channels = output.length
-
-      let remains = output[0].length
+    process([input], [output]) {
+      let channels = output.length, remains = output[0].length
       while (remains > 0) {
-        // get new chunk from queue
-        if (!this.current) {
-          if (this.current = this.queue.shift()) {
-            this.port.postMessage(this.current[0].length)
-          }
+        if (!this.cur) {
+          if (this.cur = this.q.shift()) this.port.postMessage(this.cur[0].length)
           else {
-            if (this.end) {
-              this.port.postMessage(null)
-              return false
-            }
+            if (this.end) {this.port.postMessage(null);return false}
             this.port.postMessage(0)
             break
           }
         }
-        if (this.current[0].length > remains) {
+        if (this.cur[0].length > remains) {
           for (let c = 0; c < channels; c++) {
-            output[c].set(this.current[c].subarray(0, remains), output[c].length - remains)
-            this.current[c] = this.current[c].subarray(remains)
+            output[c].set(this.cur[c].subarray(0, remains), output[c].length - remains)
+            this.cur[c] = this.cur[c].subarray(remains)
           }
           remains = 0
         }
         else {
-          for (let c = 0; c < channels; c++) {
-            output[c].set(this.current[c], output[c].length - remains)
-          }
-          remains -= this.current[0].length
-          this.current = null
+          for (let c = 0; c < channels; c++) output[c].set(this.cur[c], output[c].length - remains)
+          remains -= this.cur[0].length
+          this.cur = null
         }
       }
       return true
