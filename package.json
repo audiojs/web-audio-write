@@ -1,6 +1,6 @@
 {
   "name": "web-audio-write",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Send data to a web audio node",
   "main": "./index.js",
   "scripts": {
