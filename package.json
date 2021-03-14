@@ -4,8 +4,8 @@
   "description": "Send data to a web audio node",
   "main": "./index.js",
   "scripts": {
-    "start": "esbuild test.js --bundle --sourcemap --outfile=bundle.js --serve=8000",
-    "build": "esbuild index.js --bundle --minify --sourcemap --outfile=dist/web-audio-write.min.js"
+    "start": "esbuild index.js --bundle --minify --sourcemap --format=esm --outfile=dist/web-audio-write.min.js --watch",
+    "build": "esbuild index.js --bundle --minify --sourcemap --format=esm --outfile=dist/web-audio-write.min.js"
   },
   "browserslist": [
     "last 1 Chrome versions"

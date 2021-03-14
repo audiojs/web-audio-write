@@ -1,7 +1,7 @@
 import 'audioworklet-polyfill'
 
 // FIXME: move worklet into a separate file
-const workletURL = URL.createObjectURL(new Blob([`
+const workletURL = URL.createObjectURL(new Blob([(function(){
   registerProcessor('writer-worklet', class extends AudioWorkletProcessor {
     constructor() {
       super()
@@ -37,7 +37,7 @@ const workletURL = URL.createObjectURL(new Blob([`
       return true
     }
   })
-`], { type: 'text/javascript' }));
+}).toString().slice(11,-1)], { type: 'text/javascript' }));
 
 // to be sync-api compatible, it creates worklet lazily
 export default function createWriter (dest) {

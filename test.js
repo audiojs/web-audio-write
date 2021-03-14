@@ -1,5 +1,5 @@
-import t from 'tst'
-import createWriter from './index.js'
+import t from 'https://unpkg.com/tst@6.1.1/index.js'
+import createWriter from './dist/web-audio-write.min.js'
 
 let interaction = new Promise((resolve) => {
 	console.log('Click to start tests')
